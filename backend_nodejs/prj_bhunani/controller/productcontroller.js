@@ -7,6 +7,36 @@ const isDateInRange = (date, startDate, endDate) => {
 const parseDate = (dateStr) => {
   return new Date(dateStr);
 };
+
+const clientCheckoutDetails = (req,res)=>{  
+  const { first_name, last_name,email,password,mobile,role,state, zipcode, street } = req.body;
+
+  const query = 'CALL order_details(?, ?, ?, ?, ?, ?,?,?,?)';
+
+  db.query(query, [first_name, last_name,email,password,mobile,role,state, zipcode, street], (error, results) => {
+      if (error) {
+          console.error(error);
+          return res.status(500).json({ error: 'Database operation failed' });
+      }
+      res.status(201).json({ message: 'User and address inserted successfully', results });
+  });
+}
+
+const getReports = (req,res)=>{  
+
+  const { from_date, to_date, type } = req.body;
+console.log("GET Reports.... ",req.body)
+  const query = 'CALL reports(?, ?, ?)';
+
+  db.query(query, [from_date,to_date,type], (error, results) => {
+      if (error) {
+          console.error(error);
+          return res.status(500).json({ error: 'Database operation failed' });
+      }
+      console.log("RESULT ",results)
+      res.status(201).json({ message: 'User and address inserted successfully', results });
+  });
+}
 const getSaleReports = (req,res)=>{  
   db.query("select * from orders", (err, result)=>{
     const { start_date, end_date } = req.body;
@@ -46,6 +76,7 @@ const getProductDetails = (req,res)=>{
    
      })  
 }
+ 
 const productSalesReport= async(req,res)=>{
   const { start_date, end_date } = req.body;
   const startDate = parseDate(start_date);
@@ -126,4 +157,4 @@ const columns = ["order_id","total_item","total_price","total_discounted_price"]
   });
   */
 }
-module.exports = {getProductDetails, getSaleReports, productSalesReport}
+module.exports = {getProductDetails, getSaleReports, productSalesReport,clientCheckoutDetails, getReports}
